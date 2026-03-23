@@ -16,6 +16,22 @@ import { AnimatedBottomSheet } from '../components/AnimatedBottomSheet';
 
 const NAV_ITEMS = [
   {
+    label: 'Finance Overview',
+    description: 'Check balances and requests',
+    icon: 'bar-chart-outline',
+    screen: 'FinanceOverview',
+    color: '#ff3d30',
+    bg: '#fee2e2',
+  },
+  {
+    label: 'Login',
+    description: 'Sign into your account',
+    icon: 'log-in-outline',
+    screen: 'Login',
+    color: '#ec4899',
+    bg: '#fdf2f8',
+  },
+  {
     label: 'Send Money',
     description: 'Transfer funds to anyone',
     icon: 'cash-outline',
@@ -110,7 +126,6 @@ const NavigationHubScreen = () => {
             </TouchableOpacity>
           </View>
         </View>
-
 
         {/* Nav buttons */}
         {NAV_ITEMS.map((item) => (

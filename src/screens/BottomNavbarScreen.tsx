@@ -10,6 +10,8 @@ import SelectCardsScreen from './SelectCardsScreen';
 import SendMoneyScreen from './SendMoneyScreen';
 import NavigationHubScreen from './NavigationHubScreen';
 import InvestmentScreen from './Investment/InvestmentScreen';
+import LoginScreen from './LoginScreen';
+import FinanceOverviewScreen from './FinanceOverviewScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -179,6 +181,8 @@ const BottomNavbarScreen = () => (
       <Stack.Screen name="Tabs" component={TabNavigator} />
       <Stack.Screen name="SendMoney" component={SendMoneyScreen} />
       <Stack.Screen name="Investment" component={InvestmentScreen} />
+      <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="FinanceOverview" component={FinanceOverviewScreen} />
     </Stack.Navigator>
   </NavigationContainer>
 );
