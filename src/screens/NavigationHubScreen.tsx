@@ -8,6 +8,8 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@react-native-vector-icons/ionicons';
+import { useDispatch } from 'react-redux';
+import { logout } from '../store/slices/authSlice';
 import { AnimatedDialog } from '../components/AnimatedDialog';
 import { AnimatedBottomSheet } from '../components/AnimatedBottomSheet';
 
@@ -15,6 +17,14 @@ import { AnimatedBottomSheet } from '../components/AnimatedBottomSheet';
 // ── Nav item config ───────────────────────────────────────────────────────────
 
 const NAV_ITEMS = [
+  {
+    label: 'Sign Up',
+    description: 'Create a new secure account',
+    icon: 'person-add-outline',
+    screen: 'Signup',
+    color: '#6366f1',
+    bg: '#e0e7ff',
+  },
   {
     label: 'Finance Overview',
     description: 'Check balances and requests',
@@ -24,9 +34,9 @@ const NAV_ITEMS = [
     bg: '#fee2e2',
   },
   {
-    label: 'Login',
-    description: 'Sign into your account',
-    icon: 'log-in-outline',
+    label: 'Log Out',
+    description: 'Sign out securely',
+    icon: 'log-out-outline',
     screen: 'Login',
     color: '#ec4899',
     bg: '#fdf2f8',
@@ -69,6 +79,7 @@ const NAV_ITEMS = [
 
 const NavigationHubScreen = () => {
   const navigation = useNavigation<any>();
+  const dispatch = useDispatch();
   const [isDialogVisible, setDialogVisible] = useState(false);
   const [isSheetVisible, setSheetVisible] = useState(false);
   const insets = useSafeAreaInsets();
@@ -76,10 +87,10 @@ const NavigationHubScreen = () => {
   return (
     <View style={{ flex: 1, backgroundColor: '#f8f9ff' }}>
       <ScrollView
-        contentContainerStyle={{ 
-          paddingTop: insets.top + 24, 
-          paddingBottom: insets.bottom + 120, 
-          paddingHorizontal: 24 
+        contentContainerStyle={{
+          paddingTop: insets.top + 24,
+          paddingBottom: insets.bottom + 120,
+          paddingHorizontal: 24
         }}
         showsVerticalScrollIndicator={false}
       >
@@ -100,12 +111,12 @@ const NavigationHubScreen = () => {
           </Text>
           <View
             style={{
-               width: 36,
-               height: 3,
-               borderRadius: 2,
-               backgroundColor: '#6366f1',
-               marginTop: 10,
-               marginBottom: 24,
+              width: 36,
+              height: 3,
+              borderRadius: 2,
+              backgroundColor: '#6366f1',
+              marginTop: 10,
+              marginBottom: 24,
             }}
           />
 
@@ -132,6 +143,10 @@ const NavigationHubScreen = () => {
           <TouchableOpacity
             key={item.screen}
             onPress={() => {
+              // Intercept Auth screens completely. You cannot route to them while authenticated.
+              if (item.screen === 'Login' || item.screen === 'Signup') {
+                return dispatch(logout());
+              }
               if (item.screen === 'SendMoney') {
                 return navigation.navigate('SendMoney');
               }

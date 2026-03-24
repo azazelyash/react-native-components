@@ -12,6 +12,7 @@ import NavigationHubScreen from './NavigationHubScreen';
 import InvestmentScreen from './Investment/InvestmentScreen';
 import LoginScreen from './LoginScreen';
 import FinanceOverviewScreen from './FinanceOverviewScreen';
+import SignupScreen from './SignupScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -175,16 +176,36 @@ function TabNavigator({ navigation }: { navigation: any }) {
 
 // ── Root stack ────────────────────────────────────────────────────────────────
 
-const BottomNavbarScreen = () => (
-  <NavigationContainer>
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Tabs" component={TabNavigator} />
-      <Stack.Screen name="SendMoney" component={SendMoneyScreen} />
-      <Stack.Screen name="Investment" component={InvestmentScreen} />
-      <Stack.Screen name="Login" component={LoginScreen} />
-      <Stack.Screen name="FinanceOverview" component={FinanceOverviewScreen} />
-    </Stack.Navigator>
-  </NavigationContainer>
-);
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
+
+const BottomNavbarScreen = () => {
+  // Navigation Controller intercepting user session
+  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
+
+  return (
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        
+        {isAuthenticated ? (
+          // ── App authenticated stack ───────────────────────────────────────
+          <>
+            <Stack.Screen name="Tabs" component={TabNavigator} />
+            <Stack.Screen name="SendMoney" component={SendMoneyScreen} />
+            <Stack.Screen name="Investment" component={InvestmentScreen} />
+            <Stack.Screen name="FinanceOverview" component={FinanceOverviewScreen} />
+          </>
+        ) : (
+          // ── Auth fallback unauthenticated stack ───────────────────────────
+          <>
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="Signup" component={SignupScreen} options={{ animation: 'slide_from_bottom' }} />
+          </>
+        )}
+
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+};
 
 export default BottomNavbarScreen;

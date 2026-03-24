@@ -8,6 +8,10 @@ import NetInfo from '@react-native-community/netinfo';
 import { enableScreens } from 'react-native-screens';
 import { StatusBar } from 'react-native';
 
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
+import { store, persistor } from './src/store';
+
 enableScreens();
 
 function App() {
@@ -24,15 +28,20 @@ function App() {
   }, []);
 
   return (
-    <SafeAreaProvider>
-      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
-      
-      {/* Main App Navigation */}
-      <BottomNavbarScreen />
-      
-      {/* Transparent Global Overlay when user drops internet connection */}
-      {isConnected === false && <NoInternetScreen />}
-    </SafeAreaProvider>
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <SafeAreaProvider>
+          <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
+
+          {/* Main App Navigation */}
+          <BottomNavbarScreen />
+
+          {/* Transparent Global Overlay when user drops internet connection */}
+          {isConnected === false && <NoInternetScreen />}
+
+        </SafeAreaProvider>
+      </PersistGate>
+    </Provider>
   );
 }
 

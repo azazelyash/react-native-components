@@ -11,12 +11,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@react-native-vector-icons/ionicons';
 import { useNavigation } from '@react-navigation/native';
+import { useDispatch } from 'react-redux';
+import { setCredentials } from '../store/slices/authSlice';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const LoginScreen = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
+  const dispatch = useDispatch();
 
   // Login Form State
   const [email, setEmail] = useState('');
@@ -64,10 +67,18 @@ const LoginScreen = () => {
           ['nav_login_email', email],
           ['nav_login_password', password]
         ]);
-        Alert.alert('Success', 'Login information saved successfully!');
+
+        // Simulating the API login success response grabbing tokens
+        dispatch(setCredentials({
+          user: { email },
+          accessToken: 'mock_access_token_xyz',
+          refreshToken: 'mock_refresh_token_123'
+        }));
+
+        // Success notification handled visually by Navigation Controller automatically switching stacks!
       } catch (e) {
         console.error('Failed to save login info.', e);
-        Alert.alert('Error', 'Failed to save login information.');
+        Alert.alert('Error', 'Failed to authenticate.');
       }
     }
   };
@@ -86,12 +97,12 @@ const LoginScreen = () => {
   };
 
   return (
-    <View 
-      className="flex-1 bg-[#f8f9ff]" 
+    <View
+      className="flex-1 bg-[#f8f9ff]"
       style={{ paddingTop: insets.top }}
     >
       {/* Header */}
-      <View className="flex-row items-center px-5 py-4">
+      {/* <View className="flex-row items-center px-5 py-4">
         <TouchableOpacity 
           onPress={() => navigation.goBack()} 
           className="p-2 -ml-2 mr-2 bg-[#ffffff] rounded-xl shadow-sm elevation-2"
@@ -99,20 +110,20 @@ const LoginScreen = () => {
           <Ionicons name="chevron-back" size={24} color="#000000" />
         </TouchableOpacity>
         <Text className="text-xl font-bold text-[#000000]">Back to Hub</Text>
-      </View>
+      </View> */}
 
       <ScrollView contentContainerClassName="p-6">
         {/* Login Form */}
         <View className="bg-[#ffffff] p-6 rounded-3xl border border-[#ebebf0] shadow-sm elevation-3">
           <Text className="text-2xl font-extrabold text-[#0f0f0f] mb-2">Welcome Back</Text>
           <Text className="text-sm text-[#6b7280] mb-6">Sign in to continue accessing your account.</Text>
-          
+
           <TextInput
             className={`border p-4 rounded-xl bg-[#fcfcfd] text-[#0f0f0f] text-base ${emailError ? 'border-[#ef4444] mb-1.5' : 'border-[#ebebf0] mb-4'}`}
             placeholder="Email Address"
             placeholderTextColor="#9ca3af"
             value={email}
-            onChangeText={(text) => { setEmail(text); if(emailError) setEmailError(''); }}
+            onChangeText={(text) => { setEmail(text); if (emailError) setEmailError(''); }}
             keyboardType="email-address"
             autoCapitalize="none"
           />
@@ -123,21 +134,21 @@ const LoginScreen = () => {
             placeholder="Password"
             placeholderTextColor="#9ca3af"
             value={password}
-            onChangeText={(text) => { setPassword(text); if(passwordError) setPasswordError(''); }}
+            onChangeText={(text) => { setPassword(text); if (passwordError) setPasswordError(''); }}
             secureTextEntry
           />
           {!!passwordError && <Text className="text-[#ef4444] text-sm mb-8 px-1">{passwordError}</Text>}
 
           <View className="flex-col gap-3">
-            <TouchableOpacity 
-              onPress={handleLoginSubmit} 
+            <TouchableOpacity
+              onPress={handleLoginSubmit}
               className="bg-[#6366f1] py-4 rounded-xl items-center shadow-md shadow-[#6366f1]/30 elevation-4"
             >
               <Text className="text-[#ffffff] font-bold text-base">Submit & Save</Text>
             </TouchableOpacity>
-            
-            <TouchableOpacity 
-              onPress={handleClearData} 
+
+            <TouchableOpacity
+              onPress={handleClearData}
               className="bg-[#fee2e2] py-4 rounded-xl items-center"
             >
               <Text className="text-[#ef4444] font-bold text-base">Clear Saved Data</Text>
