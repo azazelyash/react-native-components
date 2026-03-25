@@ -4,6 +4,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import BottomNavbarScreen from './src/screens/BottomNavbarScreen';
 import NoInternetScreen from './src/screens/NoInternetScreen';
 import NetInfo from '@react-native-community/netinfo';
+import { BiometricWrapper } from './src/components/BiometricWrapper';
 
 import { enableScreens } from 'react-native-screens';
 import { StatusBar } from 'react-native';
@@ -33,12 +34,14 @@ function App() {
         <SafeAreaProvider>
           <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
 
-          {/* Main App Navigation */}
-          <BottomNavbarScreen />
+          {/* Global Biometric App Lock layer */}
+          <BiometricWrapper>
+            {/* Main App Navigation */}
+            <BottomNavbarScreen />
 
-          {/* Transparent Global Overlay when user drops internet connection */}
-          {isConnected === false && <NoInternetScreen />}
-
+            {/* Transparent Global Overlay when user drops internet connection */}
+            {isConnected === false && <NoInternetScreen />}
+          </BiometricWrapper>
         </SafeAreaProvider>
       </PersistGate>
     </Provider>
