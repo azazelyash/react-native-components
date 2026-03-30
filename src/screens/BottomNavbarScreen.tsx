@@ -4,6 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator, BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@react-native-vector-icons/ionicons';
+import { BlurView } from '@react-native-community/blur';
 
 import HomeScreen from './HomeScreen';
 import SelectCardsScreen from './SelectCardsScreen';
@@ -13,6 +14,7 @@ import InvestmentScreen from './Investment/InvestmentScreen';
 import LoginScreen from './LoginScreen';
 import FinanceOverviewScreen from './FinanceOverviewScreen';
 import SignupScreen from './SignupScreen';
+import UIComponentsScreen from './UIComponentsScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -29,11 +31,15 @@ const ICONS: Record<string, [string, string]> = {
 function PillButton({
   label,
   focused,
+  activeColor = '#0a0a0a',
+  inactiveColor = 'rgba(10, 10, 10, 0.5)',
   onPress,
   onLongPress,
 }: {
   label: string;
   focused: boolean;
+  activeColor?: string;
+  inactiveColor?: string;
   onPress: () => void;
   onLongPress: () => void;
 }) {
@@ -50,9 +56,9 @@ function PillButton({
       bounciness: 2,
     }).start();
 
-    // Ripple burst — expand a white circle from center, fade out
+    // Ripple burst — expand a dark circle from center, fade out
     rippleScale.setValue(0);
-    rippleOpacity.setValue(0.35);
+    rippleOpacity.setValue(0.15);
     Animated.parallel([
       Animated.timing(rippleScale, {
         toValue: 1.8,
@@ -93,7 +99,7 @@ function PillButton({
             width: 40,
             height: 40,
             borderRadius: 20,
-            backgroundColor: '#ffffff',
+            backgroundColor: activeColor,
             opacity: rippleOpacity,
             transform: [{ scale: rippleScale }],
           }}
@@ -102,8 +108,8 @@ function PillButton({
         <Animated.View style={{ transform: [{ scale }] }}>
           <Ionicons
             name={(focused ? filled : outline) as any}
-            size={22}
-            color={focused ? '#ffffff' : '#666666'}
+            size={focused ? 26 : 22}
+            color={focused ? activeColor : inactiveColor}
           />
         </Animated.View>
       </View>
@@ -113,37 +119,60 @@ function PillButton({
 
 // ── Custom tab bar ────────────────────────────────────────────────────────────
 
-function CustomTabBar({ state, navigation }: BottomTabBarProps) {
+function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   return (
-    <View className="absolute bottom-10 left-0 right-0 items-center" pointerEvents="box-none">
-      <View className="flex-row items-center justify-evenly bg-[#0a0a0a] rounded-full h-16 w-64 p-2 shadow-lg">
-        {state.routes.map((route, index) => {
-          const focused = state.index === index;
+    <View className="absolute bottom-8 left-0 right-0 items-center px-4" pointerEvents="box-none">
+      <View
+        className="w-full max-w-sm overflow-hidden rounded-[100px] border-[1.5px] border-white/50 shadow-2xl"
+        style={{
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 10 },
+          shadowOpacity: 0.25,
+          shadowRadius: 15,
+          elevation: 10,
+        }}
+      >
+        <BlurView
+          style={{ position: 'absolute', top: 0, left: 0, bottom: 0, right: 0 }}
+          blurType="light"
+          blurAmount={5}
+          reducedTransparencyFallbackColor="white"
+        />
+        <View className="flex-row items-center justify-evenly h-[56px] px-2 bg-white/5">
+          {state.routes.map((route, index) => {
+            const { options } = descriptors[route.key];
+            const activeColor = options.tabBarActiveTintColor || '#0a0a0a';
+            const inactiveColor = options.tabBarInactiveTintColor || 'rgba(10, 10, 10, 0.5)';
 
-          const onPress = () => {
-            const event = navigation.emit({
-              type: 'tabPress',
-              target: route.key,
-              canPreventDefault: true,
-            });
-            if (!focused && !event.defaultPrevented) {
-              navigation.navigate(route.name);
-            }
-          };
+            const focused = state.index === index;
 
-          const onLongPress = () =>
-            navigation.emit({ type: 'tabLongPress', target: route.key });
+            const onPress = () => {
+              const event = navigation.emit({
+                type: 'tabPress',
+                target: route.key,
+                canPreventDefault: true,
+              });
+              if (!focused && !event.defaultPrevented) {
+                navigation.navigate(route.name);
+              }
+            };
 
-          return (
-            <PillButton
-              key={route.key}
-              label={route.name}
-              focused={focused}
-              onPress={onPress}
-              onLongPress={onLongPress}
-            />
-          );
-        })}
+            const onLongPress = () =>
+              navigation.emit({ type: 'tabLongPress', target: route.key });
+
+            return (
+              <PillButton
+                key={route.key}
+                label={route.name}
+                focused={focused}
+                activeColor={activeColor}
+                inactiveColor={inactiveColor}
+                onPress={onPress}
+                onLongPress={onLongPress}
+              />
+            );
+          })}
+        </View>
       </View>
     </View>
   );
@@ -155,9 +184,21 @@ function TabNavigator({ navigation }: { navigation: any }) {
   return (
     <Tab.Navigator
       tabBar={(props) => <CustomTabBar {...props} />}
-      screenOptions={{ headerShown: false }}
+      screenOptions={{ 
+        headerShown: false,
+        tabBarActiveTintColor: '#0a0a0a',
+        tabBarInactiveTintColor: 'rgba(10, 10, 10, 0.5)'
+      }}
     >
-      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen 
+        name="Home" 
+        component={HomeScreen} 
+        options={{
+          // Example: If HomeScreen has a dark background, uncomment these lines
+          // tabBarActiveTintColor: '#ffffff',
+          // tabBarInactiveTintColor: 'rgba(255, 255, 255, 0.7)'
+        }}
+      />
       <Tab.Screen name="SelectCards" component={SelectCardsScreen} />
       <Tab.Screen
         name="SendMoneyTab"
@@ -186,7 +227,7 @@ const BottomNavbarScreen = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        
+
         {isAuthenticated ? (
           // ── App authenticated stack ───────────────────────────────────────
           <>
@@ -194,6 +235,7 @@ const BottomNavbarScreen = () => {
             <Stack.Screen name="SendMoney" component={SendMoneyScreen} />
             <Stack.Screen name="Investment" component={InvestmentScreen} />
             <Stack.Screen name="FinanceOverview" component={FinanceOverviewScreen} />
+            <Stack.Screen name="UIComponents" component={UIComponentsScreen} />
           </>
         ) : (
           // ── Auth fallback unauthenticated stack ───────────────────────────

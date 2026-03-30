@@ -55,16 +55,16 @@ const SelectCardsScreen = () => {
   const dispatch = useDispatch<AppDispatch>();
   const insets = useSafeAreaInsets();
 
-  const { data: users, loading: loading } = useSelector((state: RootState) => state.users);
+  const { data: users, loading, error } = useSelector((state: RootState) => state.users);
 
   // We track local refreshing state to show refreshing spinner without blocking
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    if (users.length === 0 && !loading) {
+    if (users.length === 0 && !loading && !error) {
       dispatch(fetchUsers());
     }
-  }, [dispatch, users.length, loading]);
+  }, [dispatch, users.length, loading, error]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -81,6 +81,21 @@ const SelectCardsScreen = () => {
       {loading && users.length === 0 ? (
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#0000ff" />
+        </View>
+      ) : error && users.length === 0 ? (
+        <View className="flex-1 items-center justify-center p-6">
+          <Text className="text-red-500 text-xl font-bold text-center mb-2">
+            Oops! Something went wrong.
+          </Text>
+          <Text className="text-gray-500 text-center mb-6">
+            {error || 'Failed to load users. Please try again.'}
+          </Text>
+          <TouchableOpacity
+            className="bg-primary px-8 py-3 rounded-xl shadow-sm active:opacity-80"
+            onPress={() => dispatch(fetchUsers())}
+          >
+            <Text className="text-white font-semibold text-base">Try Again</Text>
+          </TouchableOpacity>
         </View>
       ) : (
         <View className="flex-1 p-2">

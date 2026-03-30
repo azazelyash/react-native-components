@@ -73,6 +73,14 @@ const NAV_ITEMS = [
     color: '#10b981',
     bg: '#d1fae5',
   },
+  {
+    label: 'UI Components',
+    description: 'Reusable custom elements',
+    icon: 'cube-outline',
+    screen: 'UIComponents',
+    color: '#8b5cf6',
+    bg: '#ede9fe',
+  },
 ];
 
 // ── Screen ────────────────────────────────────────────────────────────────────
